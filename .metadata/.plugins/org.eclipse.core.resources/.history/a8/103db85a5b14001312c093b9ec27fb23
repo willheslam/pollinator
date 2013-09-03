@@ -1,7 +1,0 @@
-package com.loden.rogue.pollinator.models.player;
-
-import com.loden.rogue.pollinator.models.Entity;
-
-public class PlayerEntity extends Entity{
-
-}
