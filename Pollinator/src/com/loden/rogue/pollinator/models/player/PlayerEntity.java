@@ -17,7 +17,7 @@ public class PlayerEntity extends Entity {
 		}
 
 		public void resize() {
-				tileSize = 128f;
+				tileSize = 64f;
 				width = tileSize;
 				height = tileSize;
 				speed = tileSize / 10f;
@@ -31,7 +31,6 @@ public class PlayerEntity extends Entity {
 	
 		public void update(){
 				tmpVelocity.set(velocity);
-				getPosition().add(tmpVelocity.scl(Gdx.graphics.getDeltaTime()
-							  				* speed));
+				getPosition().add(tmpVelocity.scl(Gdx.graphics.getDeltaTime() * speed));
 		}
 }
