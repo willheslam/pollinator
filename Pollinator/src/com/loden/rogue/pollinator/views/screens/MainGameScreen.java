@@ -7,19 +7,29 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.loden.rogue.pollinator.Pollinator;
+import com.loden.rogue.pollinator.models.ImageHandler;
+import com.loden.rogue.pollinator.models.player.PlayerEntity;
+import com.loden.rogue.pollinator.views.renderers.PlayerRenderer;
 
 public class MainGameScreen implements Screen {
 		private static final int VIRTUAL_WIDTH = 800;
 		private static final int VIRTUAL_HEIGHT = 480;
-		private static final float ASPECT_RATIO =
-							   (float)VIRTUAL_WIDTH/(float)VIRTUAL_HEIGHT;
+		private static final float ASPECT_RATIO = (float)VIRTUAL_WIDTH/(float)VIRTUAL_HEIGHT;
 		
 		Pollinator game;
 		private OrthographicCamera camera;
 		private Rectangle viewport;
+		private ImageHandler imageHandler;
+		
+		private PlayerEntity player;
+		private PlayerRenderer playerRenderer;
 		
 		public MainGameScreen(Pollinator game){
 				this.game = game;
+				
+				imageHandler = new ImageHandler();
+				imageHandler.loadTextures();
+				loadEntities();
 				
 				camera = new OrthographicCamera();
 				camera.setToOrtho(false, VIRTUAL_WIDTH, VIRTUAL_HEIGHT);
@@ -30,9 +40,10 @@ public class MainGameScreen implements Screen {
 				camera.update();
 				camera.apply(Gdx.gl10);
 	        
-				Gdx.gl.glViewport((int) viewport.x, (int) viewport.y,
-	                          	  (int) viewport.width, (int) viewport.height);
+				Gdx.gl.glViewport((int) viewport.x, (int) viewport.y, (int) viewport.width, (int) viewport.height);
 				Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
+				
+				playerRenderer.render(camera);
 		}
 
 		@Override
@@ -78,5 +89,12 @@ public class MainGameScreen implements Screen {
 
 		@Override
 		public void dispose() {
+				imageHandler.disposeTextures();
+		}
+		
+		public void loadEntities(){
+				player =  new PlayerEntity();
+				player.setPosition(new Vector2(VIRTUAL_WIDTH / 2 - player.tileSize / 2, player.tileSize));
+				playerRenderer = new PlayerRenderer(player, imageHandler);
 		}
 }
