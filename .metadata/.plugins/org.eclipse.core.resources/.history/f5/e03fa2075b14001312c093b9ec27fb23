@@ -1,0 +1,5 @@
+package com.loden.rogue.pollinator.models.player;
+
+public class PlayerEntity {
+
+}

@@ -1,0 +1,5 @@
+package com.loden.rogue.pollinator.models;
+
+public class Entity {
+
+}
