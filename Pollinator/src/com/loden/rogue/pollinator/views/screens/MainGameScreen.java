@@ -2,12 +2,16 @@ package com.loden.rogue.pollinator.views.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL10;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.loden.rogue.pollinator.Pollinator;
 import com.loden.rogue.pollinator.models.ImageHandler;
+import com.loden.rogue.pollinator.models.ImageHandler.DistanceFieldFont;
 import com.loden.rogue.pollinator.models.player.PlayerEntity;
 import com.loden.rogue.pollinator.views.renderers.PlayerRenderer;
 
@@ -38,12 +42,18 @@ public class MainGameScreen implements Screen {
 		@Override
 		public void render(float delta) {
 				camera.update();
-				camera.apply(Gdx.gl10);
 	        
 				Gdx.gl.glViewport((int) viewport.x, (int) viewport.y, (int) viewport.width, (int) viewport.height);
-				Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
+				Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 				
 				playerRenderer.render(camera);
+				
+				Gdx.gl20.glEnable(GL20.GL_BLEND);
+				
+				DistanceFieldFont titleFont = imageHandler.getTitleFont();
+				titleFont.draw(imageHandler.getSpriteBatch(), 50,450, 100, "The Pollinator", Color.CYAN, Color.ORANGE, 2.5f);
+				//		
+				imageHandler.getSpriteBatch().end();
 		}
 
 		@Override
