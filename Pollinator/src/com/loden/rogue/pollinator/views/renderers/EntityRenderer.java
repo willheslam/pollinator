@@ -1,10 +1,8 @@
 package com.loden.rogue.pollinator.views.renderers;
 
-import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 public interface EntityRenderer {
-		
-		public void render(OrthographicCamera camera);
-		
-		public void disposeBatch();
+	
+		void render(SpriteBatch batch);
 }

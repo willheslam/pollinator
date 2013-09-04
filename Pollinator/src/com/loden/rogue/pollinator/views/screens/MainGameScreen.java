@@ -3,17 +3,17 @@ package com.loden.rogue.pollinator.views.screens;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.loden.rogue.pollinator.Pollinator;
 import com.loden.rogue.pollinator.models.ImageHandler;
-import com.loden.rogue.pollinator.models.ImageHandler.DistanceFieldFont;
+import com.loden.rogue.pollinator.models.fonts.FontHandler;
 import com.loden.rogue.pollinator.models.player.PlayerEntity;
 import com.loden.rogue.pollinator.views.renderers.PlayerRenderer;
+import com.loden.rogue.pollinator.views.renderers.TitleFontRenderer;
 
 public class MainGameScreen implements Screen {
 		private static final int VIRTUAL_WIDTH = 800;
@@ -21,22 +21,34 @@ public class MainGameScreen implements Screen {
 		private static final float ASPECT_RATIO = (float)VIRTUAL_WIDTH/(float)VIRTUAL_HEIGHT;
 		
 		Pollinator game;
+		
 		private OrthographicCamera camera;
 		private Rectangle viewport;
 		private ImageHandler imageHandler;
+		private SpriteBatch batch;
 		
 		private PlayerEntity player;
 		private PlayerRenderer playerRenderer;
+		
+		private TitleFontRenderer titleFontRenderer;
+		private FontHandler fontHandler;
 		
 		public MainGameScreen(Pollinator game){
 				this.game = game;
 				
 				imageHandler = new ImageHandler();
 				imageHandler.loadTextures();
+				fontHandler =  new FontHandler();
+				fontHandler.loadFonts();
+				titleFontRenderer = fontHandler.getTitleFont();
+				
 				loadEntities();
 				
 				camera = new OrthographicCamera();
 				camera.setToOrtho(false, VIRTUAL_WIDTH, VIRTUAL_HEIGHT);
+				batch = new SpriteBatch();
+				batch.setProjectionMatrix(camera.combined);
+				
 		}
 	
 		@Override
@@ -45,15 +57,12 @@ public class MainGameScreen implements Screen {
 	        
 				Gdx.gl.glViewport((int) viewport.x, (int) viewport.y, (int) viewport.width, (int) viewport.height);
 				Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-				
-				playerRenderer.render(camera);
-				
 				Gdx.gl20.glEnable(GL20.GL_BLEND);
-				
-				DistanceFieldFont titleFont = imageHandler.getTitleFont();
-				titleFont.draw(imageHandler.getSpriteBatch(), 50,450, 100, "The Pollinator", Color.CYAN, Color.ORANGE, 2.5f);
-				//		
-				imageHandler.getSpriteBatch().end();
+								
+				batch.begin();
+				titleFontRenderer.render(batch, 50, 450, 100, "The Pollinator", Color.CYAN, Color.ORANGE, 2.5f);
+				playerRenderer.render(batch);
+				batch.end();
 		}
 
 		@Override
@@ -99,7 +108,10 @@ public class MainGameScreen implements Screen {
 
 		@Override
 		public void dispose() {
+				batch.dispose();
 				imageHandler.disposeTextures();
+				fontHandler.dispose();
+				titleFontRenderer.dispose();
 		}
 		
 		public void loadEntities(){
