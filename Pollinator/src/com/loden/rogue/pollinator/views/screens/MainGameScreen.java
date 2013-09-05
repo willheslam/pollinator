@@ -1,15 +1,22 @@
 package com.loden.rogue.pollinator.views.screens;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g3d.ModelBatch;
+import com.badlogic.gdx.graphics.g3d.lights.DirectionalLight;
+import com.badlogic.gdx.graphics.g3d.lights.Lights;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.loden.rogue.pollinator.Pollinator;
+import com.loden.rogue.pollinator.models.AssetHandler;
 import com.loden.rogue.pollinator.models.ImageHandler;
+import com.loden.rogue.pollinator.models.ModelHandler;
 import com.loden.rogue.pollinator.models.fonts.FontHandler;
 import com.loden.rogue.pollinator.models.player.PlayerEntity;
 import com.loden.rogue.pollinator.views.renderers.PlayerRenderer;
@@ -23,24 +30,100 @@ public class MainGameScreen implements Screen {
 		Pollinator game;
 		
 		private OrthographicCamera camera;
+		private PerspectiveCamera camera3D;
 		private Rectangle viewport;
-		private ImageHandler imageHandler;
+
 		private SpriteBatch batch;
 		
 		private PlayerEntity player;
 		private PlayerRenderer playerRenderer;
 		
 		private TitleFontRenderer titleFontRenderer;
-		private FontHandler fontHandler;
+
+		private Lights lights;
+		
+	    public ModelBatch modelBatch;
+	    
+		public void setUpInput(){
+			
+			InputProcessor touchInput = new InputProcessor(){
+
+				@Override
+				public boolean keyDown(int keycode) {
+					// TODO Auto-generated method stub
+					return false;
+				}
+
+				@Override
+				public boolean keyUp(int keycode) {
+					// TODO Auto-generated method stub
+					return false;
+				}
+
+				@Override
+				public boolean keyTyped(char character) {
+					// TODO Auto-generated method stub
+					return false;
+				}
+
+				@Override
+				public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+					// TODO Auto-generated method stub
+					return false;
+				}
+
+				@Override
+				public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+					// TODO Auto-generated method stub
+					return false;
+				}
+
+				@Override
+				public boolean touchDragged(int screenX, int screenY, int pointer) {
+					
+					Vector2 relCoords = new Vector2(screenX / (float) Gdx.graphics.getWidth(),screenY / (float) Gdx.graphics.getHeight());
+					
+					relCoords.sub(0.5f, 0.5f);
+			
+					relCoords.y = - relCoords.y;
+					
+					if(screenX / (float) Gdx.graphics.getWidth() > 0.5){
+						//right side of screen
+
+						player.setRightHandSide(relCoords);
+					}else{
+						//left side of screen
+						player.setLeftHandSide(relCoords);
+					}
+					return false;
+				}
+
+				@Override
+				public boolean mouseMoved(int screenX, int screenY) {
+					// TODO Auto-generated method stub
+					return false;
+				}
+
+				@Override
+				public boolean scrolled(int amount) {
+					// TODO Auto-generated method stub
+					return false;
+				}
+			};
+			
+			Gdx.input.setInputProcessor(touchInput);
+		}
 		
 		public MainGameScreen(Pollinator game){
 				this.game = game;
 				
-				imageHandler = new ImageHandler();
-				imageHandler.loadTextures();
-				fontHandler =  new FontHandler();
-				fontHandler.loadFonts();
-				titleFontRenderer = fontHandler.getTitleFont();
+				setUpInput();
+				
+				AssetHandler.load();
+				
+				AssetHandler.get();
+				
+				titleFontRenderer = AssetHandler.fonts.getTitleFont();
 				
 				loadEntities();
 				
@@ -49,18 +132,46 @@ public class MainGameScreen implements Screen {
 				batch = new SpriteBatch();
 				batch.setProjectionMatrix(camera.combined);
 				
+				camera3D = new PerspectiveCamera(70, VIRTUAL_WIDTH, VIRTUAL_HEIGHT);
+				camera3D.position.set(1f, 1f, 1f);
+				camera3D.lookAt(0,0,0);
+				camera3D.near = 0.1f;
+				camera3D.far = 20f;
+				camera3D.update();
+				
+				modelBatch = new ModelBatch();
+				
+				
+		        lights = new Lights();
+		        lights.ambientLight.set(0.2f,0.45f,0.05f, 1f);
+		        lights.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, -1f, -0.8f, -0.2f));
+		        
+				
 		}
 	
 		@Override
 		public void render(float delta) {
 				camera.update();
+				camera3D.update();
+				
+				player.update();
 	        
 				Gdx.gl.glViewport((int) viewport.x, (int) viewport.y, (int) viewport.width, (int) viewport.height);
-				Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+				Gdx.gl.glClearColor(0.2f,0.45f,0.05f,0f);
+				Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 				Gdx.gl20.glEnable(GL20.GL_BLEND);
-								
+
+				
+				Gdx.gl20.glEnable(GL20.GL_CULL_FACE);
+		        modelBatch.begin(camera3D);
+				playerRenderer.render(modelBatch,lights);
+				modelBatch.end();
+				Gdx.gl20.glDisable(GL20.GL_CULL_FACE);
+				
+				
 				batch.begin();
-				titleFontRenderer.render(batch, 50, 450, 100, "The Pollinator", Color.CYAN, Color.ORANGE, 2.5f);
+				titleFontRenderer.render(batch, 50, 450, 100, "The Pollinator", Color.YELLOW, Color.ORANGE, 2.5f);
+				titleFontRenderer.render(batch, 50, 300, 50, "FPS: " + Gdx.graphics.getFramesPerSecond(), Color.CYAN, Color.RED, 2f);
 				playerRenderer.render(batch);
 				batch.end();
 		}
@@ -109,14 +220,12 @@ public class MainGameScreen implements Screen {
 		@Override
 		public void dispose() {
 				batch.dispose();
-				imageHandler.disposeTextures();
-				fontHandler.dispose();
-				titleFontRenderer.dispose();
+				modelBatch.dispose();
 		}
 		
 		public void loadEntities(){
 				player =  new PlayerEntity();
 				player.setPosition(new Vector2(VIRTUAL_WIDTH / 2 - player.tileSize / 2, player.tileSize));
-				playerRenderer = new PlayerRenderer(player, imageHandler);
+				playerRenderer = new PlayerRenderer(player);
 		}
 }

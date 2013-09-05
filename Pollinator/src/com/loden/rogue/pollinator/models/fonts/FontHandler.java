@@ -5,17 +5,24 @@ import com.badlogic.gdx.assets.loaders.TextureLoader.TextureParameter;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.loden.rogue.pollinator.models.Handler;
 import com.loden.rogue.pollinator.views.renderers.TitleFontRenderer;
 
-public class FontHandler extends AssetManager{
+public class FontHandler implements Handler{
 		private TitleFontRenderer titleFont;
 		private TextureParameter paramMaxMip;
 	
 		public FontHandler(){
-				titleFont = new TitleFontRenderer();
+
+		}
+
+		public void get(AssetManager man){
+			titleFont = new TitleFontRenderer();
+        	titleFont.font = man.get("data/fonts/jura-regular-70-signed.fnt", BitmapFont.class);
+        	titleFont.spread = 5;
 		}
 		
-		public void loadFonts(){
+		public void load(AssetManager man){
 				/************************
 				 * maximum prettiness - * 
 				 * Can probably afford  * 
@@ -28,13 +35,9 @@ public class FontHandler extends AssetManager{
 	        	paramMaxMip.magFilter = TextureFilter.MipMapLinearLinear;
 	        	paramMaxMip.genMipMaps = true;
 	           
-	        	load("data/fonts/jura-regular-70-signed.png", Texture.class, paramMaxMip);
-	        	load("data/fonts/jura-regular-70-signed.fnt", BitmapFont.class);
+	        	man.load("data/fonts/jura-regular-70-signed.png", Texture.class, paramMaxMip);
+	        	man.load("data/fonts/jura-regular-70-signed.fnt", BitmapFont.class);
 	        
-	        	finishLoading();
-	        	
-	        	titleFont.font = get("data/fonts/jura-regular-70-signed.fnt", BitmapFont.class);
-	        	titleFont.spread = 5;
 		}
 		
 		public TitleFontRenderer getTitleFont(){
@@ -43,6 +46,5 @@ public class FontHandler extends AssetManager{
 		
 		public void dispose(){
 				titleFont.dispose();
-			
 		}
 }

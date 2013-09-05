@@ -1,1 +1,6 @@
 .metadata
+.gitignore
+*~
+Pollinator/bin
+Pollinator-desktop/bin
+Pollinator-android/bin

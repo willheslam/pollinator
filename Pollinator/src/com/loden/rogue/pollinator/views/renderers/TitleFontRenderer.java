@@ -41,7 +41,5 @@ public class TitleFontRenderer {
 		
 		public void dispose(){
 				drawFontShader.dispose();
-				shaderHandler.dispose();
-				font.dispose();
 		}
 }

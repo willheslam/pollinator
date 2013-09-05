@@ -1,16 +1,22 @@
 package com.loden.rogue.pollinator.models.shaders;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.loden.rogue.pollinator.models.Handler;
 
-public class ShaderHandler {
+public class ShaderHandler implements Handler{
 		ShaderProgram fontShader;
 		
 		public ShaderHandler(){
 		}
 		
-		public void loadShaders(){
+		public void load(AssetManager man){
 				loadFontShader();
+		}
+		
+		public void get(AssetManager man){
+			
 		}
 		
 		public void loadFontShader(){
