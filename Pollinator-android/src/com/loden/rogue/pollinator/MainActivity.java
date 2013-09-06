@@ -10,9 +10,9 @@ public class MainActivity extends AndroidApplication {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
-        AndroidApplicationConfiguration cfg = new AndroidApplicationConfiguration();
-        cfg.useGL20 = true;
-        
+        AndroidApplicationConfiguration cfg =  new AndroidApplicationConfiguration();
+        cfg.useGL20 = true ;
+         
         initialize(new Pollinator(), cfg);
     }
 }
