@@ -5,12 +5,15 @@ import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Mesh;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.lights.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.lights.Lights;
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.loden.rogue.pollinator.Pollinator;
@@ -161,12 +164,51 @@ public class MainGameScreen implements Screen {
 				Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 				Gdx.gl20.glEnable(GL20.GL_BLEND);
 
-				
+				/*
 				Gdx.gl20.glEnable(GL20.GL_CULL_FACE);
 		        modelBatch.begin(camera3D);
 				playerRenderer.render(modelBatch,lights);
 				modelBatch.end();
 				Gdx.gl20.glDisable(GL20.GL_CULL_FACE);
+				*/
+				
+				Gdx.gl20.glEnable(GL20.GL_CULL_FACE);
+				Gdx.gl20.glCullFace(GL20.GL_BACK);
+				
+				Gdx.gl20.glEnable(GL20.GL_DEPTH_TEST);
+				Gdx.gl20.glDepthMask(true);
+				Gdx.gl20.glDepthFunc(GL20.GL_LESS);
+				
+	            long time = System.currentTimeMillis();
+
+	            long duration = 5000;
+	            long lastDuration =  (((long) (time / (double) duration )) * duration);
+
+	            float progressDuration = (float) Math.abs(((time - lastDuration) / (double) duration));
+				
+				ShaderProgram monkeyShader = AssetHandler.shaders.getMonkeyShader();
+				Mesh monkeyMesh = AssetHandler.models.getMonkeyMesh();
+				
+				Matrix4 monkeyMatrix = new Matrix4();
+				
+				Matrix4 monkeyProj = new Matrix4().setToProjection(0.1f, 10.0f, 80, ASPECT_RATIO);
+			
+				Matrix4 monkeyView = new Matrix4().translate(0, 0, -4 * (Gdx.input.getX() / (float) Gdx.graphics.getWidth()));
+				
+				Matrix4 monkeyModel = new Matrix4().rotate(0, 1, 0, 360 * progressDuration).scale(0.25f, 0.25f, 0.25f);
+				
+				monkeyMatrix.mul(monkeyProj).mul(monkeyView).mul(monkeyModel);
+				
+				monkeyShader.begin();
+				monkeyShader.setUniformMatrix("matrix", monkeyMatrix);
+				
+				monkeyMesh.render(monkeyShader,GL20.GL_TRIANGLES);
+				
+				monkeyShader.end();
+				
+				Gdx.gl20.glDisable(GL20.GL_CULL_FACE);
+				Gdx.gl20.glDepthMask(false);
+				
 				
 				
 				batch.begin();

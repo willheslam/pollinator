@@ -8,6 +8,8 @@ import com.loden.rogue.pollinator.models.Handler;
 public class ShaderHandler implements Handler{
 		ShaderProgram fontShader;
 		
+		ShaderProgram monkeyShader;
+		
 		public ShaderHandler(){
 		}
 		
@@ -26,6 +28,18 @@ public class ShaderHandler implements Handler{
 		    			Gdx.app.log("problem compiling font shader:", fontShader.getLog());
 		    			System.exit(0);
 				}
+				
+				monkeyShader = new ShaderProgram(Gdx.files.internal("data/shaders/monkey.vrt"),Gdx.files.internal("data/shaders/monkey.frg"));
+			    
+				if (monkeyShader.isCompiled() == false){
+		    			Gdx.app.log("problem compiling monkey shader:", monkeyShader.getLog());
+		    			System.exit(0);
+				}
+				
+		}
+		
+		public ShaderProgram getMonkeyShader(){
+			return monkeyShader;
 		}
 		
 		public ShaderProgram getFontShader(){
